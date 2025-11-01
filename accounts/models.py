@@ -16,6 +16,11 @@ class CustomUserManager(UserManager):
         user.set_password(password) # A security check for hashing passwords
         # save the user object in the db
         user.save(using=self.db)
+        
+        # Automatically assign 'regular' role to new users
+        regular_role, created = Roles.objects.get_or_create(name='regular')
+        UserRole.objects.create(user=user, role=regular_role)
+        
         return user
     
 
@@ -43,6 +48,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     username = models.CharField(unique=True, blank=True, null=True, max_length=150)
     profile_picture = models.ImageField(upload_to='profile_picture', null=True, blank=True)
+    role = models.ManyToManyField('Roles', through='UserRole', related_name='users', blank=True)
 
     objects = CustomUserManager()
 
@@ -51,3 +57,27 @@ class CustomUser(AbstractUser):
     
     # Tells the superuser to prompt for the username as well as the email
     REQUIRED_FIELDS = ['username']
+
+class Roles(models.Model):
+    """
+    A model to define the roles of the users
+    """
+    ROLES = {
+        ('organizer', 'Organizer'),
+        ('regular', 'Regular')
+    }
+    name = models.CharField(max_length=50, choices=ROLES, default='regular')
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+    
+class UserRole(models.Model):
+    """
+    A junction model to define the relationship between the user and the role
+    """
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_roles')
+    role = models.ForeignKey(Roles, on_delete=models.CASCADE, related_name='user_roles')
+
+    def __str__(self):
+        return f"{self.user.email} - {self.role.name}"
