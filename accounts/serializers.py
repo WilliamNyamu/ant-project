@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
+from .models import Roles, UserRole
 
 User = get_user_model()
 
@@ -43,4 +44,27 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'first_name', 'last_name', 'profile_picture']
-        
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Roles
+        fields = ['id', 'name', 'description']
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    roles = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 
+            'email',
+            'username',
+            'profile_picture',
+            'roles',
+            'date_joined'
+        ]
+        read_only_fields = ['date_joined']
+
+    def get_roles(self, obj):
+        user_roles = UserRole.objects.filter(user=obj)
+        return [user_role.role.name for user_role in user_roles]

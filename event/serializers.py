@@ -24,7 +24,9 @@ class EventSerializer(serializers.ModelSerializer):
             'organizer',
             'is_organizer',
             'interested_count',
-            'is_interested'
+            'is_interested',
+            'reg_link',
+            'instagram_link'
         ]
         read_only_fields = ['created_at', 'updated_at', 'organizer']
 
@@ -35,12 +37,12 @@ class EventSerializer(serializers.ModelSerializer):
         return False
     
     def get_interested_count(self, obj):
-        return obj.interested_users.count()
+        return obj.interests.count()
     
     def get_is_interested(self, obj):
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
-            return EventInterest.objects.filter(event=obj, user=request.user).exists()
+            return obj.interests.filter(user=request.user).exists()
         return False
 
     def create(self, validated_data):
