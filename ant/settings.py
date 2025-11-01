@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'accounts',
-    'event'
+    'event',
+    'post',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# media configuration
+MEDIA_URL = '/media/' # url prefix for the images
+MEDIA_ROOT = BASE_DIR / 'media' # the actual path where the media files will be stored
+
+# To enable Token Authentication
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}

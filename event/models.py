@@ -19,7 +19,8 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
-    link = models.URLField(blank=True, null=True)
+    reg_link = models.URLField(blank=True, null=True)
+    instagram_link = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -32,3 +33,14 @@ def create_event(sender, instance, created, **kwargs):
         # Add the organizer role to the user if they don't already have it
         UserRole.objects.get_or_create(user=instance.organizer, role=organizer_role)
 
+class EventInterest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interested_events')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='interests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'event')
+
+    def __str__(self):
+        return f'{self.user.email} is interested in {self.event.name}'
+    
