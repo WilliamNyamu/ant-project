@@ -49,6 +49,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(unique=True, blank=True, null=True, max_length=150)
     profile_picture = models.ImageField(upload_to='profile_picture', null=True, blank=True)
     role = models.ManyToManyField('Roles', through='UserRole', related_name='users', blank=True)
+    followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
 
     objects = CustomUserManager()
 
