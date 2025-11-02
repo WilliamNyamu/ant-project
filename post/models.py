@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from event.models import Event
 import os
 
 # Create your models here.
@@ -35,6 +36,13 @@ class Post(models.Model):
         max_length=10, 
         choices=POST_TYPES, 
         default='text'
+    )
+    tagged_event = models.ForeignKey(
+        'event.Event',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tagged_posts'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

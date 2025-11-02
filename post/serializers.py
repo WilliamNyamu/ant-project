@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Post, Like
 from accounts.serializers import CustomUserSerializer
+from event.serializers import EventSerializer
+from event.models import Event
 
 class LikeSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
@@ -16,6 +18,14 @@ class PostSerializer(serializers.ModelSerializer):
     is_liked = serializers.SerializerMethodField()
     post_type = serializers.CharField(read_only=True)
     likes = LikeSerializer(many=True, read_only=True)
+    tagged_event = EventSerializer(read_only=True)
+    tagged_event_id = serializers.PrimaryKeyRelatedField(
+        queryset=Event.objects.all(),
+        source='tagged_event',
+        write_only=True,
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = Post
@@ -30,7 +40,9 @@ class PostSerializer(serializers.ModelSerializer):
             'updated_at',
             'likes_count',
             'is_liked',
-            'likes'
+            'likes',
+            'tagged_event',
+            'tagged_event_id'
         ]
         read_only_fields = ['created_at', 'updated_at', 'user', 'post_type']
 
